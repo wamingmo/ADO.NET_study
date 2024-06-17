@@ -1,0 +1,221 @@
+
+
+使用JavaScriptSerializer类序列化和反序列化
+ public class students
+    {
+        private string _student_no;
+        private string _student_name;
+        private string _gender;
+        private string _faculty;
+
+        public string student_no {
+            get { return _student_name; }
+            set { _student_name = value; }
+        }
+        public string student_name {
+        get { return _student_name; }
+        set { _student_name = value; }
+        }
+public string gender
+        {
+            get { return _gender; }
+            set { _gender = value; }
+        }
+public string faculty
+        {
+            get { return _faculty; }
+            set { _faculty = value; }
+        }
+
+//下面是构造函数
+public students(string sno, string sname, string gender, string faculty)
+        {
+            this.student_no = sno;
+            this.student_name = sname;
+            this.gender = gender;
+            this.faculty = faculty;
+        }
+//定义各种方法的代码
+
+
+    }
+
+需要引入命名空间：
+using System.Web.Script.Serialization;
+还需要在“解决方案资源管理器”中，“引用”→右键，“添加引用”→“System.Web.Extensions” 。
+（1）序列化
+建立一个5_3.aspx文件，引入命名空间using System.Web.Script.Serialization;后，在Page_Load()事件中输入以下代码：
+List< students > stu = new List< students >();
+stu.Add(new students("9501", "张三", "男","计算机系"));
+stu.Add(new students("9601", "李芳", "女","环境系"));
+stu.Add(new students("9701", "赵五", "男","能源系"));
+JavaScriptSerializer js = new JavaScriptSerializer();
+string s = js.Serialize(stu);
+Response.Write(s);
+//在返回Response.Write()后应该调用Response.End()才能将数据写入到调用的页面,才能被JQuery的回调函数获取到返回的JSON数据
+Response.End();
+只是处理业务逻辑，不涉及界面，可以用一般处理程序ashx替代。将上述代码中Response改为context. Response，并且删除Response.End();后放在ashx的：
+public void ProcessRequest(HttpContext context){}中。
+
+下面利用jQuery，将服务器序列化的数据显示在客户机上。 5_3.html
+<body>
+  <script type="text/javascript" src="Scripts/jquery.min.js"></script>
+  <div id="result"></div>
+  <button onclick="display()">显示</button>
+  <script>
+        function display() {
+            $.get("5_3.aspx", function (returnData) {
+                var jsonObj = eval('(' + returnData + ')');
+                $.each(jsonObj, function (index, value) {
+                    $("#result").append("学号" + value["student_no"] + "姓名：" + value[“student_name"] + "<br/>");
+                });
+            });
+        }
+   </script></body>
+①$.get()以Ajax方式向服务器端请求数据；
+②var jsonObj = eval('(' + returnData + ')');将JSON字符串转变为JSON对象；
+③$.each(jsonObj, function (index, value)是jQuery遍历对象的一种方法。jsonObj必须是对象（数组、JSON、DOM等），后台传过来的JSON字符串，要经过eval、str.parseJSON()、JSON.parse(str)等方法转换为对象。index是当前元素的位置，value是值。 在$.each()测试：alert(jsonObj[index].sno);
+$.each()可以替换为：
+for (var i = 0; i < jsonObj.length; i++)
+   $("#result").append("学号："+jsonObj[i].student_no+",姓名："+jsonObj[i].student_name+"</br>");
+
+如何读取DataTable中数据，下面是示例：
+SqlConnection cnn = new SqlConnection("server=.;database=students;uid=sa;pwd=3500");
+SqlDataAdapter adapter1 = new SqlDataAdapter("select * from student", cnn);
+DataTable dt = new DataTable();
+adapter1.Fill(dt);
+for (int i = 0; i < dt.Rows.Count; i++)
+  {
+     Response.write(dt.Rows[i][“student_no”].ToString());//读取当前记录的student_no列
+   }
+
+（2）反序列化
+将JSON字符串转变为JSON对象。新建立一个5_4.aspx窗体文件，在Page_Load()事件中输入以下代码：
+string desJson="[{\"student_no\":\"9501\",\"name\":\"张三\",\"gender\":\"男\"},";
+desJson+="{\"student_no\":\"9601\",\"name\":\"李芳\",\"gender\":\"女\"},";
+desJson+= "{\"student_no\":\"9701\",\"name\":\"赵五\",\"gender\":\"男\"}]";
+JavaScriptSerializer js = new JavaScriptSerializer();
+Students [] model = js.Deserialize<Students []>(desJson);//反序列化
+for (int i = 0; i < model.Length; i++)
+{
+ string message = string.Format("学号={0},姓名={1},性别={2}", model[i].student_no, model[i].name, model[i].gender);
+  Response.Write(message+"<br>");
+}
+说明：
+在使用Deserialize反序列化时，由于desJson字符串是个数组，故需要：
+Students[] model = js.Deserialize< Students[]>(desJson);
+或者：
+List<Students> model = js.Deserialize<List<Students>>(desJson); 
+但for (int i = 0; i < model.Length; i++)要改为for (int i = 0; i < model.Count; i++)
+而不能：
+Students model = js.Deserialize< Students >(desJson);//错误提示：数组的反序列化不支持类型。
+
+使用formatter格式化器序列化和反序列化
+序列化工作由一个特定的格式化器（formatter）完成，每个格式化器都提供Serialize和Deserialize两个方法。当格式化器将某个对象序列化后，将结果放入一个流（Stream）中，因此可以包容任何序列化格式。一个对象被存储于一个流之中，对象的状态可以被存储于磁盘上（或者说是persistent：被持久化）。
+需要引入命名空间：
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
+List<Students> stu = new List<Students>();
+stu.Add(new Students("9501", "张三", "男","资源系"));
+stu.Add(new Students("9601", "李芳", "女","计算机系"));
+stu.Add(new Students("9701", "赵五", "男","土木系"));
+Stream stream = File.Open(Server.MapPath("DataFile.dat"), FileMode.Create, FileAccess.Write);
+//序列化
+BinaryFormatter formatter = new BinaryFormatter();
+formatter.Serialize(stream, stu);
+stream.Close();
+//反序列化
+Stream filestream = File.Open(Server.MapPath("DataFile.dat"), FileMode.Open);
+//返回List<student>，必须强制转换
+List<Students> newStu = (List<Students>)formatter.Deserialize(filestream);
+for (int i = 0; i < newStu.Count; i++)
+  {
+   string message = string.Format("学号={0},姓名={1},性别={2}", newStu[i].student_no, newStu[i].name, newStu[i].gender);
+   Response.Write(message + "<br>");
+   }
+说明：
+①这种二进制序列化的方式，将对象的状态保存在一个二进制文件（如DataFile.dat）中，对网络传输很方便；
+②formatter序列化对象时，需要在Person类和Students类上标记[Serializable]特性，既将这两个类修改为：
+namespace aspExample.chapter5
+{
+    [Serializable]
+    public class Person
+    {
+……
+}
+    [Serializable]
+    public sealed class Students:Person
+    {
+……
+}}
+
+使用Json.NET序列化和反序列化
+下载Newtonsoft.Json.dll后，在VS资源管理器中“引用”—“添加引用”，将Newtonsoft.Json.dll引用到当前项目中，然后引入命名空间：using Newtonsoft.Json;
+下面代码示例了使用Json.NET序列化和反序列化：
+List<Students> stu = new List<Students>();
+stu.Add(new Students("9501", "张三", "男"));
+stu.Add(new Students("9601", "李芳", "女"));
+stu.Add(new Students("9701", "赵五", "男"));
+//Json.NET序列化
+string jsonData = JsonConvert.SerializeObject(stu);
+Response.Write(jsonData);
+//反序列化
+string desJson = "[{\"student_no\":\"9501\",\"name\":\"张三\",\"gender\":\"男\"},";
+desJson += "{\"student_no\":\"9601\",\"name\":\"李芳\",\"gender\":\"女\"},";
+desJson += "{\"student_no\":\"9701\",\"name\":\"赵五\",\"gender\":\"男\"}]";
+List<Students> model = JsonConvert.DeserializeObject<List<Students>>(desJson) 
+for (int i = 0; i < model.Count; i++)
+  {
+  string message = string.Format("学号={0},姓名={1},性别={2}", model[i].student_no, model[i].name, model[i].gender);
+Response.Write(message + "<br>");}
+
+使用Json.NET序列化数据库中表并在前台用easyUI显示—test1. html
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="js/themes/default/easyui.css" />
+    <link rel="stylesheet" type="text/css" href="js/themes/icon.css" />
+    <link rel="stylesheet" type="text/css" href="js/demo.css" />
+</head>
+<body>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+    <button onclick="showTable()">显示</button>
+<table id="tt1" class="easyui-datagrid"
+           title="学生全部记录" style="width:550px;height:400px">
+        <thead>
+            <tr>
+                <th field="student_no" width="100">学号</th>
+                <th field="student_name" width="100">姓名</th>
+                <th field="gender" width="50">性别</th>
+                <th field="email" width="100">email</th>
+                <th field="identification" width="180">身份证号</th>
+            </tr>
+        </thead>
+    </table>
+    <script>
+        function showTable() {
+           $("#tt1").datagrid({
+               url: “test1.ashx?m=" + Math.random()
+           });
+        }
+    </script>
+</body>
+
+使用Json.NET序列化数据库中表并在前台用easyUI显示—后台test1.ashx代
+下载Newtonsoft.Json.dll后，在VS资源管理器中“引用”—“添加引用”，将Newtonsoft.Json.dll引用到当前项目中，然后在b.ashx引入命名空间：
+using System.Web;
+using Newtonsoft.Json;
+using System.Data.SqlClient;
+using System.Data;
+ public void ProcessRequest(HttpContext context)
+        {
+            context.Response.ContentType = "text/plain";
+            SqlConnection cnn = new SqlConnection("server=.;database=students;uid=sa;pwd=3500");
+            SqlDataAdapter adapter1 = new SqlDataAdapter("select * from student", cnn);
+            DataTable dt = new DataTable();
+            adapter1.Fill(dt);
+            string jsonData = JsonConvert.SerializeObject(dt);      
+           context.Response.Write(jsonData );
+        }

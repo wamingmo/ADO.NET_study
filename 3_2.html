@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        a:link {
+            text-decoration: none;
+        }
+
+        * {
+            margin: 0px;
+            padding: 0px;
+        }
+
+        #header {
+            background-color: #FFA500;
+            height: 50px;
+            text-align: center;
+        }
+
+        #container {
+            width: 500px;
+            margin: 0 auto;
+            /*上下0，左右自适应相同距离*/
+            border: solid 1px;
+        }
+
+        .content {
+            float: left;
+            width: 300px;
+            height: 50px;
+            left: 6px;
+            top: 0px;
+        }
+
+        .bottom {
+            background-color: #FFA500;
+            text-align: center;
+            clear: left;
+            height: 50px;
+            line-height: 50px;
+        }
+    </style>
+    <script>
+        function GoToURL(introduce) {
+            document.getElementById("intro").innerHTML = introduce;
+        }
+    </script>
+
+</head>
+
+<body>
+    <div id="container">
+        <div id="header">
+            <h1 style="margin-bottom:0 auto">我的课程</h1>
+        </div>
+        <div id="left" style="background-color:#FFD700;height:200px;width:150px;float:left;">
+            <div><a href="#" onclick="GoToURL('这是一门介绍Java的好课程')">Java</a></div>
+            <div><a href="#" onclick="GoToURL('这是一门介绍Python的好课程')">Python</a></div>
+            <div><a href="#" onclick="GoToURL('这是一门介绍ASP.NET的好课程')">ASP.NET</a></div>
+            <div><a href="#" onclick="GoToURL('这是一门介绍PHP的好课程')">PHP</a></div>
+            <div><a href="#" onclick="GoToURL('这是一门介绍JSP的好课程')">JSP</a></div>
+        </div>
+        <div class="content" id="intro">
+        </div>
+        <div class="bottom">
+            版权归******所有&copy;
+        </div>
+    </div>
+</body>
+
+</html>

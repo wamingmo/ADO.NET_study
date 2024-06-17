@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <div>
+        城市：<span id="cityname"></span>
+        街道：<span id="street"></span>
+        邮编：<span id="postcode"></span>
+    </div>
+    <script>
+        var json = {
+            " Cities ": {
+                " City ": [
+                    {
+                        " Name": "Beijing",
+                        "Street": "Xueyuan Road",
+                        "Postcode": "100083"
+                    },
+                    {
+                        "Name": "Shanghai",
+                        "Street": "Baoshan Road",
+                        " Postcode": "200071"
+                    }
+                ]
+            }
+        };
+
+        document.getElementById("cityname").innerHTML = json.Cities.City[1].Name;
+        document.getElementById("street").innerHTML = json.Cities.City[1].Street;
+        document.getElementById("postcode").innerHTML = json.Cities.City[1].Postcode;
+    </script>
+</body>
+</html>
+

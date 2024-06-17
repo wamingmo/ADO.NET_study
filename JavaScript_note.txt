@@ -1,0 +1,93 @@
+    JavaScript
+    
+    语法：
+①JavaScript程序代码一般放在<script></script>中。<script>可以放在<head></head>间，也可以放在<body></body>的任意位置。
+②JavaScript定义函数语法：function 函数名([形参]){函数体}，如果函数有返回值，使用return 返回值;如果函数需要在多个网页中共享，与CSS外部链接类似，可以将JavaScript程序代码放在一个扩展名为js的文件中，如myJS.js，该文件中不能包含有<script>，内容类似于；
+    function GoToURL(introduce)
+    {
+        document.getElementById(“intro”).innerHTML = introduce;//注意大小写
+        }
+    function GetByID()
+    {    ……;     }
+在需要使用这些函数的页面的<head>或者<body>中，加入：
+<script src="myJS.js"></script>
+引用myJS.js文件时一定要注意该文件与当前网页的位置关系，上面这种写法表示myJS.js文件与当前网页文件在同一文件夹下。也可以直接在HTML的开始元素中添加JavaScript，如：<button onclick=”window.alert(‘hello’)”>单击我</button>此方式下代码显然不宜过长
+③JavaScript控制浏览器，需要使用一个浏览器模型DOM(Document Objects Models：文档对象模型)，在该模型中，定义了window、document等对象，各对象都有相应的属性和事件。Document可理解为当前浏览的页面，document.getElementById根据页面上元素的id（页面上元素的id是唯一的），找到该元素，页面元素有一个方法innerHTML，用于设置（获得）该元素间的HTML。
+④在HTML开始的元素上增加事件，所有事件都是以on开关的，如onclick、onchange、onfocus、onblur、onmouseover、onmouseout等，第2-6行在<a href="#" onclick="GoToURL()">设置为空的超链接，当单击该链接时，调用<script></script>中定义好的函数，将要显示的内容作为实参传递给该函数的形参introduce。
+
+    变量：
+var：用var关键字声明的变量没有块作用域，可以在外部访问任何在块内声明的变量；
+let：用let定义的变量可以具有块作用域，即：在块{}内部声明的任何变量都不能在块的外部访问；
+const：和let一样，用const定义的变量可以具有块作用域，在块{}内部声明的任何变量都不能在块的外部访问。const和let都有块作用域。
+	var sampleID ="gejiu_001";
+	//在这里sampleID是gejiu_001，x是undefined
+	    {
+		    let sampleID ="gejiu_002";
+                            let x=100;
+		    //在这里sampleID是gejiu_002,x是100
+		}
+		//在这里sampleID是gejiu_001，x是undefined
+let声明的变量，值和类型都可以改变，没有限制；const声明的变量必须赋初始值且值不能再被改动。
+
+    用JavaScript修改HTML元素样式：
+JavaScript利用DOM，可以修改页面元素的显示样式，修改的方法有以下几种：
+（1）document.getElementById("id").style.property="值"
+<body>
+<div id="main">
+    One morning, when Gregor Samsa woke from troubled dreams.
+</div>
+<button onclick="changeStyle()">改变背景</button>
+<script>
+    function changeStyle() {
+        var obj = document.getElementById("main");
+        obj.style.backgroundColor = "green";
+    }
+</script>
+</body>
+（2）document.getElementById("id").style.cssText="css属性:值"
+将上面的脚本改为：
+<script>
+    function changeStyle() {
+        var obj = document.getElementById("main");
+        obj.style.cssText= "background-color:green";
+    }
+</script>
+要注意cssText中设置的属性名与style.属性名并不完全一致，如backgroundColor与background-color。cssText设置的属性名采用的是CSS中的属性，而obj.style中采用的属性是HTML中的属性，要注意区分。
+（3）document.getElementById("id").setAttribute("class", "style")
+<head> <title></title>
+    <style>
+        .backSet {
+            background-color:blue;
+            color:white;
+        }
+    </style></head>
+<body>
+<div id="main">
+    One morning, when Gregor Samsa woke from troubled dreams.
+</div>
+<button onclick="changeStyle()">改变背景</button>
+<script>
+    function changeStyle() {
+        var obj = document.getElementById("main");
+        //obj.className = "backSet";和下一行具有相同作用
+        obj.setAttribute("class","backSet");
+    }
+</script></body></html>
+
+
+    数组对象：
+数组创建：
+var arr1 = new Array();
+var arr2 = new Array("","");
+var arr3 = ["",""];
+用下标访问数组
+对象创建：
+var person = new Object();
+person.name = "wu";
+function person(name){
+    this.name = name;
+    this.getName = function(){
+        return name+" "+ " ";
+    }
+}
+

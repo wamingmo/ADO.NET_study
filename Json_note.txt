@@ -1,0 +1,133 @@
+﻿    Json
+假设有以下前关于城市的信息：
+Name:Beijing
+Street:Xueyuan Road
+Postcode:100083
+将以上信息用JSON表示为：key:value
+{" Name " : "Beijing", " Street " : "Xueyuan Road", " Postcode " : "100083" }
+
+JSON的语法格式是：
+（1）数据在名称/值对中
+如" Name " : "Beijing"名称/值，名称和值间用冒号分开。JSON中的值可以是：数字、字符串、逻辑值true或false、放在[]中的数组、放在{}中的对象、null。
+（2）数据由逗号分隔
+（3）用花括号保存对象
+（4）用方括号保存数组
+
+对象结构:
+以"{"大括号开始，以"}"大括号结束。中间部分由多个以"，"分隔的"key(关键字)/value(值)"对构成，关键字和值之间以"："分隔，语法结构如下：
+{
+    key1:value1,
+    key2:value2,
+    ...
+}
+其中关键字是字符串，而值可以是字符串，数值，true,false,null,对象或数组。
+
+数组结构:
+以"["开始，"]"结束。中间由多个以","分隔的值列表组成，语法结构如下：
+[
+    {
+        key1:value1,
+        key2:value2
+    },
+    {
+         key3:value3,
+         key4:value4  
+    }
+]
+
+
+    Json文本串转换为js对象
+（1）使用JavaScript的函数eval()
+<body><div>
+城市：<span id="cityname"></span>  街道：<span id="street"></span>  邮编：<span id="postcode"></span>
+     </div> 
+    <script>
+        var txt = ‘{" Name" : "Beijing", " Street" : "Xueyuan Road", " Postcode" : "100083" }';
+        var json = eval("(" + txt + ")");
+        document.getElementById("cityname").innerHTML = json.Name;
+        document.getElementById("street").innerHTML = json.Street;
+        document.getElementById("postcode").innerHTML = json.Postcode;
+    </script></body>
+    该方法转换时必须将要转换的JSON字符串包围在括号中。由于eval()函数可编译并执行任何JavaScript代码，使用时有潜在的安全问题
+
+（2）JSON.parse()
+<body>
+     <div>
+        城市：<span id="cityname"></span>
+        街道：<span id="street"></span>
+        邮编：<span id="postcode"></span>
+     </div> 
+<script>
+        var txt = '{ "Name": "Beijing","Street": "Xueyuan Road", "Postcode": "100083" }';
+        var json = JSON.parse(txt);;
+        document.getElementById("cityname").innerHTML = json.Name;
+        document.getElementById("street").innerHTML = json.Street;
+        document.getElementById("postcode").innerHTML = json.Postcode;
+    </script>
+</body>
+使用JSON.parse()时需要注意：①JSON的字符串中属性名都必须加双引号，如Street必须是"Street"；
+                          ②字符串必须是单引号套双引号，如果写作：var txt = "{ 'Name': 'Beijing','Street': 'Xueyuan Road', 'Postcode': 100083 }"; var json = JSON.parse(txt);不能转换生成JSON对象。
+
+    将js对象转换为json字符串
+将一个 JavaScript 对象转换为一个 JSON 字符串，使用stringify方法，语法格式：
+JSON.stringify(value [, replacer] [, space])
+其中：value：是必选字段，是要转换的对象，如数组，类等；  
+replacer：可选。它又分为2种方式，一种是数组，一种是方法；
+space：分隔符
+示例代码如下：
+<script>
+var student = new Object(); 
+student.name = "张平"; 
+student.age = 25; 
+student.location = "中国"; 
+var json = JSON.stringify(student); 
+alert(json); 
+</script>
+
+    JSON的序列化和反序列
+jQuery前后台数据交互最简单的示例
+服务器端：test1.ashx，向浏览器输出一个JSON字符串
+public void ProcessRequest(HttpContext context)
+{
+context.Response.Write("[{\"sno\":\"123\",\"sname\":\"zhang\"}]");
+}
+浏览器端：test2.html，将接收到的JSON字符串反序列化转变为对象jsonObj 
+ <script type="text/javascript" src="Scripts/jquery.min.js"></script>
+   <div id="content"></div>
+    <script>
+        $.get("test1.ashx", function (returnData) {
+            var jsonObj = JSON.parse(returnData);
+            //也可以var jsonObj = eval("(" + returnData+")");
+          for (var i = 0; i < jsonObj.length; i++)
+                $("#content").append("学号："+jsonObj[i].sno+",姓名："+jsonObj[i].sname+"</br>");
+        })
+    </script>
+浏览器端如果使用jQuery easyUI显示上面数据，可以:
+<head> 
+    <link rel="stylesheet" type="text/css" href="scripts/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="scripts/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="scripts/demo.css">
+</head>
+<body> 
+    <script type="text/javascript" src="Scripts/jquery.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery.easyui.min.js"></script>
+    <button onclick="showTable()">显示</button>
+    <table id="tt1" class="easyui-datagrid"
+           title="学生全部记录" style="width:550px;height:400px">
+        <thead>
+            <tr>
+                <th field="sno" width="100">学号</th>
+                <th field="sname" width="100">姓名</th>
+             </tr>
+        </thead>
+    </table>
+    <script>
+        function showTable() {            
+            $("#tt1").datagrid({
+                url: "test1.ashx?m=" + Math.random()
+            });
+        }
+    </script>
+</body>
+
+

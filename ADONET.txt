@@ -1,0 +1,26 @@
+
+（1）基于连接的对象
+它们是数据提供程序对象，包括有：Connection、DataReader、Command和DataAdapter，它们连接到数据库，执行SQL语句，可以将查询的结果填充到DataSet中。命名空间与提供程序有关，如SQL Server的提供程序，其命名空间是System.Data.SqlClient。
+（2）基于断开连接的对象
+这些对象包括DataSet、DataColumn、DataRow、DataRelation等，它们与数据源独立，命名空间是System.Data。
+
+Connection
+②以SQL Server身份验证的方式登录时，如果采用SQL Server数据源提供程序：
+string cnnString="server= servername;database=数据库名; uid=用户名;pwd=密码" ;
+SqlConnection Conn = new SqlConnection(cnnString);
+连接字符串也可以写作：
+string cnnString="Data Source=servername;Initial Catalog=数据库名; uid=用户名;pwd=密码"
+③以Windows身份验证登录SQL Server时
+string cnnString="Data Source=servername;Initial Catalog=数据库名;trusted_connection=true";
+或者：
+string cnnString="server= servername;database=数据库名; trusted_connection=true";
+
+为了便于程序维护，一般是将数据库的连接字符串写在web.config文件的<connectionString>节中，代码如下所示：
+<configuration>
+<connectionStrings>
+<add name="SQLServerString"  connectionString="server=LBS-THINK\MSSQL_EXPRESS;database=students;uid=sa;pwd=asp123" />
+</connectionStrings>
+</configuration>
+在读取<connectionString>节内容前，需要：①引入命名空间：using System.Web.Configuration; ②导入命名空间：“解决方案资源管理器”—“引用”—右键—“添加引用”，在“程序集”—“框架”下面选中system.Configuration，两个步骤缺一不可。
+使用以下代码，读取web.config中<connectionString>节name为ConnectionSQLServerString的connectionString的值：
+string cnnString = WebConfigurationManager.ConnectionStrings["SQLServerString"].ConnectionString;
