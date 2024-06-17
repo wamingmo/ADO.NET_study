@@ -23,4 +23,6 @@ string cnnString="server= servername;database=数据库名; trusted_connection=true"
 </configuration>
 在读取<connectionString>节内容前，需要：①引入命名空间：using System.Web.Configuration; ②导入命名空间：“解决方案资源管理器”—“引用”—右键—“添加引用”，在“程序集”—“框架”下面选中system.Configuration，两个步骤缺一不可。
 使用以下代码，读取web.config中<connectionString>节name为ConnectionSQLServerString的connectionString的值：
-string cnnString = WebConfigurationManager.ConnectionStrings["SQLServerString"].ConnectionString
+string cnnString = WebConfigurationManager.ConnectionStrings["SQLServerString"].ConnectionString;
+
+
